@@ -194,6 +194,11 @@ class OpenStackShell(app.App):
             default=utils.env('OS_PASSWORD'),
             help='Authentication password (Env: OS_PASSWORD)')
         parser.add_argument(
+            '--os-tfa-password',
+            metavar='<auth-tfa-password>',
+            default=utils.env('OS_TFA_PASSWORD'),
+            help='Two-factor authentication password (Env: OS_TFA_PASSWORD)')
+        parser.add_argument(
             '--os-user-domain-name',
             metavar='<auth-user-domain-name>',
             default=utils.env('OS_USER_DOMAIN_NAME'),
@@ -354,6 +359,7 @@ class OpenStackShell(app.App):
             project_domain_name=self.options.os_project_domain_name,
             username=self.options.os_username,
             password=self.options.os_password,
+            tfa_password=self.options.os_tfa_password,
             region_name=self.options.os_region_name,
             verify=self.verify,
             api_version=self.api_version,

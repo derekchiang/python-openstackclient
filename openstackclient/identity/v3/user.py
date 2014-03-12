@@ -318,6 +318,19 @@ class SetUser(command.Command):
             action='store_true',
             help='Disable user',
         )
+        enable_tfa_group = parser.add_mutually_exclusive_group()
+        enable_tfa_group.add_argument(
+            '--enable-tfa',
+            dest="enable_tfa",
+            action='store_true',
+            help='Enable two-factor authentication for user',
+        )
+        enable_tfa_group.add_argument(
+            '--disable-tfa',
+            dest="disable_tfa",
+            action='store_true',
+            help='Disable two-factor authentication for user',
+        )
         return parser
 
     def take_action(self, parsed_args):
@@ -335,7 +348,9 @@ class SetUser(command.Command):
                 and not parsed_args.project
                 and not parsed_args.description
                 and not parsed_args.enable
-                and not parsed_args.disable):
+                and not parsed_args.disable
+                and not parsed_args.enable_tfa
+                and not parsed_args.disable_tfa):
             return
 
         user = utils.find_resource(
@@ -365,8 +380,31 @@ class SetUser(command.Command):
             kwargs['enabled'] = True
         if parsed_args.disable:
             kwargs['enabled'] = False
+        kwargs['tfa_enabled'] = getattr(user, 'tfa_enabled', False)
+        if parsed_args.enable_tfa:
+            kwargs['tfa_enabled'] = True
+        if parsed_args.disable_tfa:
+            kwargs['tfa_enabled'] = False
 
-        identity_client.users.update(user.id, **kwargs)
+        # TODO: From this point on, we need to touch the server side.
+        # You need to modify the controller such that it returns a "secret"
+        # and then, the update() call should return a dictionary that contains
+        # this secret.  Then you would output the secret on the terminal,
+        # so that the user can register.
+
+        # TODO: the following code (commented out atm) should be used once
+        # the server-side is done
+
+        # res = identity_client.users.update(user.id, **kwargs)
+        # self.app.stdout.write(
+        #     'Please enter the following secret into your TFA client: %s'
+        #     % res['secret'])
+
+        # TODO: this block is just for demonstration purposes
+        self.app.stdout.write(
+            'Please enter the following secret into your TFA client: %s\n'
+            % '1234567')  # TODO: this is for demo purpose
+
         return
 
 

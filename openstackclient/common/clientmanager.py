@@ -45,7 +45,7 @@ class ClientManager(object):
     def __init__(self, token=None, url=None, auth_url=None,
                  domain_id=None, domain_name=None,
                  project_name=None, project_id=None,
-                 username=None, password=None,
+                 username=None, password=None, tfa_password=None,
                  user_domain_id=None, user_domain_name=None,
                  project_domain_id=None, project_domain_name=None,
                  region_name=None, api_version=None, verify=True):
@@ -58,6 +58,7 @@ class ClientManager(object):
         self._project_id = project_id
         self._username = username
         self._password = password
+        self._tfa_password = tfa_password
         self._user_domain_id = user_domain_id
         self._user_domain_name = user_domain_name
         self._project_domain_id = project_domain_id
