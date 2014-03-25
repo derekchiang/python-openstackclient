@@ -380,30 +380,32 @@ class SetUser(command.Command):
             kwargs['enabled'] = True
         if parsed_args.disable:
             kwargs['enabled'] = False
-        kwargs['tfa_enabled'] = getattr(user, 'tfa_enabled', False)
+        original_tfa_enabled = getattr(user, 'tfa_enabled', False)
+        if original_tfa_enabled is False and parsed_args.enable_tfa:
+            should_reset_tfa = True
+        else:
+            should_reset_tfa = False
+        kwargs['tfa_enabled'] = original_tfa_enabled
         if parsed_args.enable_tfa:
             kwargs['tfa_enabled'] = True
         if parsed_args.disable_tfa:
             kwargs['tfa_enabled'] = False
 
-        # TODO: From this point on, we need to touch the server side.
-        # You need to modify the controller such that it returns a "secret"
-        # and then, the update() call should return a dictionary that contains
-        # this secret.  Then you would output the secret on the terminal,
-        # so that the user can register.
+        identity_client.users.update(user.id, **kwargs)
+        # TODO: update() returns a response object.  You should check it to make
+        # sure the update was successful.
 
-        # TODO: the following code (commented out atm) should be used once
-        # the server-side is done
+        if should_reset_tfa:
+            res = identity_client.users.reset_tfa_secret(user.id)
 
-        # res = identity_client.users.update(user.id, **kwargs)
-        # self.app.stdout.write(
-        #     'Please enter the following secret into your TFA client: %s'
-        #     % res['secret'])
+            self.app.stdout.write(
+                'Please enter the following secret into your TFA client: %s'
+                % res['secret'])
 
         # TODO: this block is just for demonstration purposes
-        self.app.stdout.write(
-            'Please enter the following secret into your TFA client: %s\n'
-            % '1234567')  # TODO: this is for demo purpose
+        # self.app.stdout.write(
+        #     'Please enter the following secret into your TFA client: %s\n'
+        #     % '1234567')  # TODO: this is for demo purpose
 
         return
 
