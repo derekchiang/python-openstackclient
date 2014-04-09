@@ -392,22 +392,14 @@ class SetUser(command.Command):
             kwargs['tfa_enabled'] = False
 
         identity_client.users.update(user.id, **kwargs)
-        # TODO: update() returns a response object.  You should check it to make
-        # sure the update was successful.
-
-        self.app.stdout.write("What's up dude?\n")
 
         if should_reset_tfa:
-            res = identity_client.users.reset_tfa_secret(user)
+            secret = identity_client.users.reset_tfa_secret(user.id)
 
             self.app.stdout.write(
+                'The secret was successfully reset.\n' +
                 'Please enter the following secret into your TFA client: %s\n'
-                % res['secret'])
-
-        # TODO: this block is just for demonstration purposes
-        # self.app.stdout.write(
-        #     'Please enter the following secret into your TFA client: %s\n'
-        #     % '1234567')  # TODO: this is for demo purpose
+                % secret)
 
         return
 

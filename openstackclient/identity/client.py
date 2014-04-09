@@ -49,6 +49,7 @@ def make_client(instance):
         client = identity_client(
             username=instance._username,
             password=instance._password,
+            tfa_password=instance._tfa_password,
             user_domain_id=instance._user_domain_id,
             user_domain_name=instance._user_domain_name,
             project_domain_id=instance._project_domain_id,
